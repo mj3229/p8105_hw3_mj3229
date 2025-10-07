@@ -10,10 +10,56 @@ library(tidyverse)
 ```
 
 ## Problem 1
+**Loading dataset and creating plot**
 
 ```{r}
 library(p8105.datasets)
 data("instacart")
 
+instacart_df = instacart
 ```
 
+```{r}
+instacart_df %>% 
+  group_by(aisle) %>% 
+  summarize(n_obs = n()) %>% 
+  mutate(aisle_rank = min_rank(desc(n_obs))) %>% 
+  arrange(aisle_rank) %>% 
+  filter(n_obs > 10000) %>% 
+  ggplot(aes(x = aisle, y = n_obs)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Number of Items Ordered in each Aisle",
+    x = "Aisle Name",
+    y = "Number of Items Ordered"
+  )
+```
+
+**Creating Tables**
+
+```{r}
+instacart_df %>% 
+  filter(aisle %in% c("baking ingredients")) %>% 
+  group_by(aisle, product_name) %>% 
+  summarize(n_baking =n()) %>% 
+  mutate(baking_rank = min_rank(desc(n_baking))) %>% 
+  arrange(baking_rank)
+
+instacart_df %>% 
+  filter(aisle %in% c("dog food care")) %>% 
+  group_by(aisle, product_name) %>% 
+  summarize(n_dog =n()) %>% 
+  mutate(dog_rank = min_rank(desc(n_dog))) %>% 
+  arrange(dog_rank)
+
+instacart_df %>% 
+  filter(aisle %in% c("packaged vegetables fruits")) %>% 
+  group_by(aisle, product_name) %>% 
+  summarize(n_packaged =n()) %>% 
+  mutate(packaged_rank = min_rank(desc(n_packaged))) %>% 
+  arrange(packaged_rank)
+```
+
+
+**There are 134 aisles with most items order from the fresh vegetables, fresh fruits, and packed vegetables fruits aisles. Top three products in baking ingredients are light brown sugar, pure baking soda, and cane sugar. Top three products in dog food care are snack sticks chicken & rice recipe dog treats, organix chicken & brown rice recipe, and small dog biscuits. Lastly, the top three products in packaged vegetables fruits are organic baby spinach, organic raspberries, and organic blueberries. 
