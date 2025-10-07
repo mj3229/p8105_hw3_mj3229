@@ -36,30 +36,59 @@ instacart_df %>%
   )
 ```
 
-**Creating Tables**
+**Creating Tables Based on Aisle**
 
 ```{r}
 instacart_df %>% 
   filter(aisle %in% c("baking ingredients")) %>% 
   group_by(aisle, product_name) %>% 
-  summarize(n_baking =n()) %>% 
+  summarize(n_baking = n()) %>% 
   mutate(baking_rank = min_rank(desc(n_baking))) %>% 
-  arrange(baking_rank)
+  arrange(baking_rank) %>% 
+  filter(baking_rank <= 3)
 
 instacart_df %>% 
   filter(aisle %in% c("dog food care")) %>% 
   group_by(aisle, product_name) %>% 
-  summarize(n_dog =n()) %>% 
+  summarize(n_dog = n()) %>% 
   mutate(dog_rank = min_rank(desc(n_dog))) %>% 
-  arrange(dog_rank)
-
+  arrange(dog_rank) %>% 
+  filter(dog_rank <= 3)
+  
 instacart_df %>% 
   filter(aisle %in% c("packaged vegetables fruits")) %>% 
   group_by(aisle, product_name) %>% 
-  summarize(n_packaged =n()) %>% 
+  summarize(n_packaged = n()) %>% 
   mutate(packaged_rank = min_rank(desc(n_packaged))) %>% 
-  arrange(packaged_rank)
+  arrange(packaged_rank) %>% 
+  filter(packaged_rank <= 3)
 ```
 
+**Top three products in baking ingredients are light brown sugar, pure baking soda, and cane sugar. Top three products in dog food care are snack sticks chicken & rice recipe dog treats, organix chicken & brown rice recipe, and small dog biscuits. Lastly, the top three products in packaged vegetables fruits are organic baby spinach, organic raspberries, and organic blueberries.** 
 
-**There are 134 aisles with most items order from the fresh vegetables, fresh fruits, and packed vegetables fruits aisles. Top three products in baking ingredients are light brown sugar, pure baking soda, and cane sugar. Top three products in dog food care are snack sticks chicken & rice recipe dog treats, organix chicken & brown rice recipe, and small dog biscuits. Lastly, the top three products in packaged vegetables fruits are organic baby spinach, organic raspberries, and organic blueberries. 
+
+**Creating Table for Pink Lady Apples and Coffee Ice Cream** 
+
+```{r}
+instacart_df %>% 
+  filter(product_name %in% c("Pink Lady Apples", "Coffee Ice Cream")) %>% 
+   mutate(
+     order_dow = recode(order_dow,
+                  `0` = "Monday",
+                  `1` = "Tuesday",
+                  `2` = "Wednesday",
+                  `3` = "Thursday",
+                  `4` = "Friday",
+                  `5` = "Saturday",
+                  `6` = "Sunday")) %>% 
+  group_by(product_name, order_dow) %>% 
+  rename("Product Name" = product_name) %>% 
+  summarize(mean_hour = mean(order_hour_of_day, na.rm = TRUE)) %>% 
+  pivot_wider(
+    names_from = order_dow,
+    values_from = mean_hour
+  ) %>% 
+  knitr::kable(digits = 1)
+```
+
+****There are 134 aisles with most items order from the fresh vegetables, fresh fruits, and packed vegetables fruits aisles. **
