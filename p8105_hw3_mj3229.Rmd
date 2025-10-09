@@ -92,3 +92,65 @@ instacart_df %>%
 ```
 
 ****There are 134 aisles with most items order from the fresh vegetables, fresh fruits, and packed vegetables fruits aisles. **
+
+## Problem 2
+
+```{r}
+zori_df = 
+  read_csv("./zillow_data/zori.csv", na = c("NA", ".", "")) %>% 
+  janitor::clean_names() %>% 
+  relocate(county_name) %>% 
+  select(-state, county = county_name) %>% 
+  mutate(county = county %>% 
+            str_replace("New York County", "New York") %>% 
+            str_replace("Kings County", "Kings") %>%
+            str_replace("Queens County", "Queens") %>%
+            str_replace("Bronx County", "Bronx") %>%
+            str_replace("Richmond County", "Richmond")) %>% 
+  rename(zip_code = region_name) %>% 
+  pivot_longer(
+    x2015_01_31:x2024_08_31,
+    names_to = "date",
+    values_to = "zillow observed rent index")
+  knitr::kable(head(zori_df, 8))
+
+
+neighborhood_df = 
+  read_csv("./zillow_data/zip_codes.csv", na = c("NA", ".", "")) %>% 
+  janitor::clean_names() %>% 
+  relocate(county, neighborhood)
+  knitr::kable(head(neighborhood_df, 8))
+```
+
+**Merging Datasets**
+
+```{r}
+zillow_df = 
+  left_join(zori_df, neighborhood_df, by = c("zip_code", "county"))%>%
+  janitor::clean_names() %>% 
+  relocate(county, neighborhood, zip_code, zillow_observed_rent_index)
+  knitr::kable(head(zillow_df, 8))
+```
+
+**Solving Problem 2**
+
+```{r}
+zip_counts =
+  zillow_df %>% 
+  group_by(zip_code) %>% 
+  summarize(n_obs = n()) %>% 
+  filter(n_obs == 116)
+
+zip_counts2 =
+  zillow_df %>% 
+  group_by(zip_code) %>% 
+  summarize(n_obs = n()) %>% 
+  filter(n_obs < 10)
+```
+
+```{r}
+
+```
+
+
+** 149 zip codes are observed 116 times and 0 are observed less than 10 times
