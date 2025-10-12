@@ -64,7 +64,7 @@ instacart_df %>%
   filter(packaged_rank <= 3)
 ```
 
-**Top three products in baking ingredients are light brown sugar, pure baking soda, and cane sugar. Top three products in dog food care are snack sticks chicken & rice recipe dog treats, organix chicken & brown rice recipe, and small dog biscuits. Lastly, the top three products in packaged vegetables fruits are organic baby spinach, organic raspberries, and organic blueberries.** 
+Top three products in baking ingredients are light brown sugar, pure baking soda, and cane sugar. Top three products in dog food care are snack sticks chicken & rice recipe dog treats, organix chicken & brown rice recipe, and small dog biscuits. Lastly, the top three products in packaged vegetables fruits are organic baby spinach, organic raspberries, and organic blueberries.
 
 
 **Creating Table for Pink Lady Apples and Coffee Ice Cream** 
@@ -91,7 +91,7 @@ instacart_df %>%
   knitr::kable(digits = 1)
 ```
 
-****There are 134 aisles with most items order from the fresh vegetables, fresh fruits, and packed vegetables fruits aisles. **
+There are 134 aisles with most items order from the fresh vegetables, fresh fruits, and packed vegetables fruits aisles. 
 
 ## Problem 2
 
@@ -132,7 +132,7 @@ zillow_df =
   knitr::kable(head(zillow_df, 8))
 ```
 
-**Solving Problem 2**
+**Zip Code Counts**
 
 ```{r}
 zip_counts =
@@ -148,6 +148,9 @@ zip_counts2 =
   filter(n_obs < 10)
 ```
 
+149 zip codes are observed 116 times and 0 are observed less than 10 times
+
+**Average rental price in each borough and year** 
 ```{r}
 zillow2_df = 
   zillow_df %>% 
@@ -158,13 +161,21 @@ zillow2_df =
   summarize(
     mean_zori = mean(zillow_observed_rent_index, na.rm = TRUE)
   ) %>% 
+  filter(!is.na(mean_zori)) %>% 
   rename(
     "Borough" = county,
     "Year" = year,
     "Average Rental Price" = mean_zori)
   knitr::kable(head(zillow2_df, 8))
-  
+```
+
+The table indicates how average rent price has increased throughout all boroughs over the years. There are specifically big changes in the New York and Kings Boroughs. Additionally, New York borough in general has the most expensive average rental prices while Bronx lies on the lower range.
+
+**Plot**
+
+```{r}
+
 ```
 
 
-** 149 zip codes are observed 116 times and 0 are observed less than 10 times
+## Problem 3
