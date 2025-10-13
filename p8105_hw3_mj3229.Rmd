@@ -224,7 +224,7 @@ nhanes_df =
 education_df = 
 nhanes_df %>% 
   group_by(education, sex) %>% 
-  summarize(n_hanes = n()) %>% 
+  summarize(n_hanes = n(), .groups = "drop") %>% 
    pivot_wider(
     names_from = sex,
     values_from = n_hanes
@@ -259,5 +259,39 @@ nhanes_df %>%
   geom_point() +
   geom_smooth(se = FALSE) +
   facet_wrap(~ sex)
+```
+
+**24 Hour Activity Time Courses**
+
+```{r}
+activity_df =
+  nhanes_df %>% 
+ pivot_longer(
+    cols = starts_with("min"),
+    names_to = "minute",
+    names_prefix = "min",
+    values_to = "activity_time"
+  ) %>%  
+  mutate(
+    minute = as.integer(minute),
+    hour = minute/60
+  )
+
+
+activity_df %>% 
+  group_by(education, sex, hour) %>% 
+  summarize(mean_activity = mean(activity_time, na.rm = TRUE), .groups = "drop") %>% 
+  ggplot(aes(x = hour, y = mean_activity, color = sex)) +
+  geom_line(alpha = 0.2) +
+  geom_smooth(se = FALSE) +
+  facet_wrap(~ education, ncol = 1) +
+  scale_x_continuous(breaks = seq(0, 24, by = 3)) +
+  labs(
+    title = "24-Hour Activity Time Course by Sex and Education",
+    x = "Hour",
+    y = "Mean Activity",
+    color = "Sex"
+  ) +
+  theme_minimal()
 ```
 
