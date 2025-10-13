@@ -19,6 +19,8 @@ data("instacart")
 instacart_df = instacart
 ```
 
+The Instacart dataset displays information on the many online grocery orders made by instacart users.The dataset contains 1,384,617 observations of 131,209 unique users, where each row in the dataset is a product from an order. Some key variables include `user_id` which identifies the orderer, `aisle_id` that identifies the aisle, `order_dow` which indicates the day of the week on which the order was placed, `produce_name` which indicates name of the product and `department` and `aisle` for department and aisle names in which purchases are broken up into. 
+
 ```{r}
 instacart_df %>% 
   group_by(aisle) %>% 
@@ -36,6 +38,8 @@ instacart_df %>%
   )
 ```
 
+There are 134 aisles with most items order from the fresh vegetables, fresh fruits, and packed vegetables fruits aisles. 
+
 **Creating Tables Based on Aisle**
 
 ```{r}
@@ -45,7 +49,8 @@ instacart_df %>%
   summarize(n_baking = n()) %>% 
   mutate(baking_rank = min_rank(desc(n_baking))) %>% 
   arrange(baking_rank) %>% 
-  filter(baking_rank <= 3)
+  filter(baking_rank <= 3) %>% 
+knitr::kable()
 
 instacart_df %>% 
   filter(aisle %in% c("dog food care")) %>% 
@@ -53,7 +58,8 @@ instacart_df %>%
   summarize(n_dog = n()) %>% 
   mutate(dog_rank = min_rank(desc(n_dog))) %>% 
   arrange(dog_rank) %>% 
-  filter(dog_rank <= 3)
+  filter(dog_rank <= 3) %>% 
+knitr::kable()
   
 instacart_df %>% 
   filter(aisle %in% c("packaged vegetables fruits")) %>% 
@@ -61,10 +67,11 @@ instacart_df %>%
   summarize(n_packaged = n()) %>% 
   mutate(packaged_rank = min_rank(desc(n_packaged))) %>% 
   arrange(packaged_rank) %>% 
-  filter(packaged_rank <= 3)
+  filter(packaged_rank <= 3) %>% 
+knitr::kable()
 ```
 
-Top three products in baking ingredients are light brown sugar, pure baking soda, and cane sugar. Top three products in dog food care are snack sticks chicken & rice recipe dog treats, organix chicken & brown rice recipe, and small dog biscuits. Lastly, the top three products in packaged vegetables fruits are organic baby spinach, organic raspberries, and organic blueberries.
+Top three products in baking ingredients are **light brown sugar, pure baking soda, and cane sugar**. Top three products in dog food care are **snack sticks chicken & rice recipe dog treats, organix chicken & brown rice recipe, and small dog biscuits**. Lastly, the top three products in packaged vegetables fruits are **organic baby spinach, organic raspberries, and organic blueberries**.
 
 
 **Creating Table for Pink Lady Apples and Coffee Ice Cream** 
@@ -91,7 +98,6 @@ instacart_df %>%
   knitr::kable(digits = 1)
 ```
 
-There are 134 aisles with most items order from the fresh vegetables, fresh fruits, and packed vegetables fruits aisles. 
 
 ## Problem 2
 
@@ -112,14 +118,14 @@ zori_df =
     x2015_01_31:x2024_08_31,
     names_to = "date",
     values_to = "zillow observed rent index")
-  knitr::kable(head(zori_df, 8))
+  knitr::kable(head(zori_df, 4))
 
 
 neighborhood_df = 
-  read_csv("./zillow_data/zip_codes.csv", na = c("NA", ".", "")) %>% 
+  read_csv("./zillow_data/zip_codes.csv", na = c("NA", ".", "")) %>%
   janitor::clean_names() %>% 
   relocate(county, neighborhood)
-  knitr::kable(head(neighborhood_df, 8))
+  knitr::kable(head(neighborhood_df, 4))
 ```
 
 **Merging Datasets**
@@ -129,7 +135,7 @@ zillow_df =
   left_join(zori_df, neighborhood_df, by = c("zip_code", "county")) %>%
   janitor::clean_names() %>% 
   relocate(county, neighborhood, zip_code, zillow_observed_rent_index)
-  knitr::kable(head(zillow_df, 8))
+  knitr::kable(head(zillow_df, 4))
 ```
 
 **Zip Code Counts**
@@ -148,7 +154,7 @@ zip_counts2 =
   filter(n_obs < 10)
 ```
 
-149 zip codes are observed 116 times and 0 are observed less than 10 times
+**149 zip codes** are observed 116 times and **0** are observed less than 10 times. Some zip codes appear fewer because they may be secluded and have a small population. They can also be newer zip codes that aren't properly defined leading to less counts. 
 
 **Average rental price in each borough and year** 
 ```{r}
@@ -159,13 +165,16 @@ zillow2_df =
   separate(date, into = c("year", "month", "day"), sep = "_") %>% 
   group_by(county, year) %>% 
   summarize(
-    mean_zori = mean(zillow_observed_rent_index, na.rm = TRUE)
+    mean_zori = mean(zillow_observed_rent_index, na.rm = TRUE),         .groups = "drop"
   ) %>% 
   filter(!is.na(mean_zori)) %>% 
   rename(
     "Borough" = county,
-    "Year" = year,
-    "Average Rental Price" = mean_zori)
+    "Year" = year) %>% 
+  pivot_wider(
+    names_from = "Borough",
+    values_from = mean_zori
+  )
   knitr::kable(head(zillow2_df, 8))
 ```
 
@@ -238,7 +247,7 @@ nhanes_df %>%
 ```{r}
 nhanes_df %>% 
   ggplot(aes(x = age, fill = sex)) +
-  geom_density(alpha = .3, adjust = .5) +
+  geom_density(alpha = .4, adjust = .8) +
   facet_wrap(~ education)
   labs(
     title = "Age Density by Sex and Education Level",
@@ -249,17 +258,29 @@ nhanes_df %>%
   theme_minimal()
 ```
 
+Looking at the table, we see the distribution between men and female in different levels of education is pretty even except for in the high school equivalent category. In the density plot, we see the distribution of both sexes across ages in different education categories. Those with less than high school education tend to be on the older end while those with more than high school education lean towards younger/middle-age ranges. Men and women have a broadly similar distribution, however, women do tend to be on the older end throughout the categories (except for more than high school education). Specifically women with more than high school education are generally younger as we can see a high peak.
+
+
 **Total Activity**
 
 ```{r}
 nhanes_df %>% 
   mutate(total_activity = rowSums(across(min1:min45), na.rm = TRUE)) %>% 
-  select(seqn, sex, age, bmi, education, total_activity ) %>% 
-  ggplot(aes(x = age, y = total_activity)) +
+  select(seqn, sex, age, bmi, education, total_activity) %>% 
+  ggplot(aes(x = age, y = total_activity, color = sex)) +
   geom_point() +
   geom_smooth(se = FALSE) +
-  facet_wrap(~ sex)
+  facet_wrap(~ education) +
+  labs(
+    title = "Total Daily Activity by Age and Education Level Across Different Sexes",
+    x = "Age(years)",
+    y = "Total Daily Activity",
+    color = "Sex"
+  ) +
+  theme(legend.position = "bottom")
 ```
+
+We can see an overall declining trend in total activity as we approach an older age in both men and women across the different education categories. Regarding sex, men tend to have higher total daily activity than women, except with those in high school equivalent category around the age of 50.There is more variability in the less than high school category but sharp declines in activity with aging. Lastly, those with more than high school education, have more stable total activity with lower activity comparitively. 
 
 **24 Hour Activity Time Courses**
 
@@ -286,12 +307,15 @@ activity_df %>%
   geom_smooth(se = FALSE) +
   facet_wrap(~ education, ncol = 1) +
   scale_x_continuous(breaks = seq(0, 24, by = 3)) +
+  scale_y_continuous(breaks = seq(0, 20, by = 2)) +
   labs(
     title = "24-Hour Activity Time Course by Sex and Education",
     x = "Hour",
     y = "Mean Activity",
     color = "Sex"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(legend.position = "bottom")
 ```
 
+Across all education levels and genders, activity is lowest during the end of the day (night) and activity is highest mid day (around 9th-15th hour). Those with less than high school education slightly have higher activity for a longer period of time, suggesting more physically demanding jobs. In men with more than high school education, we are seeing slightly less mean activity compared to other groups through different education categories. This may be described by more computer work. Lastly, we see a sharp decline towards the end of the day throughout all sexes and education categories. 
