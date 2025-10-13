@@ -179,3 +179,85 @@ The table indicates how average rent price has increased throughout all boroughs
 
 
 ## Problem 3
+
+```{r}
+accelero_df = 
+  read_csv("./accelero_data/nhanes_accel.csv", na = c("NA", ".", "")) %>% 
+  janitor::clean_names() %>% 
+  mutate(
+    seqn = as.integer(seqn),  
+  )
+
+
+covar_df =
+  read_csv("./accelero_data/nhanes_covar.csv", na = c("NA", ".", "")) %>% 
+  janitor::clean_names() %>% 
+  slice(-1:-4) %>% 
+  rename(
+    seqn = x1,
+    sex = x1_male,
+    age = x3,
+    bmi = x4,
+    education = x1_less_than_high_school
+  ) %>% 
+   mutate(
+    sex = recode(sex, `1` = "Male", `2` = "Female"),
+    education = recode(education,
+                       `1` = "Less than high school",
+                       `2` = "High school equivalent",
+                       `3` = "More than high school"),
+    seqn = as.integer(seqn),  
+    age = readr::parse_number(as.character(age)),
+    bmi = readr::parse_number(as.character(bmi))
+  ) %>%
+  filter(age >= 21) %>%
+  drop_na(sex, age, bmi, education) 
+
+
+nhanes_df = 
+  left_join(covar_df, accelero_df, by = "seqn" )
+```
+
+**Men and Women in each Education Category**
+
+```{r}
+education_df = 
+nhanes_df %>% 
+  group_by(education, sex) %>% 
+  summarize(n_hanes = n()) %>% 
+   pivot_wider(
+    names_from = sex,
+    values_from = n_hanes
+  ) %>% 
+  rename(
+    "Education" = education)
+  knitr::kable(head(education_df, 8))
+```
+
+**Plot for Age Distributions for Men and Women in each Education Category**
+```{r}
+nhanes_df %>% 
+  ggplot(aes(x = age, fill = sex)) +
+  geom_density(alpha = .3, adjust = .5) +
+  facet_wrap(~ education)
+  labs(
+    title = "Age Density by Sex and Education Level",
+    x = "Age (years)",
+    y = "Density",
+    fill = "Sex"
+  ) +
+  theme_minimal()
+```
+
+**Total Activity**
+
+```{r}
+nhanes_df %>% 
+  mutate(total_activity = rowSums(across(min1:min45), na.rm = TRUE)) %>% 
+  select(seqn, sex, age, bmi, education, total_activity ) %>% 
+  ggplot(aes(x = age, y = total_activity)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  facet_wrap(~ sex)
+```
+
