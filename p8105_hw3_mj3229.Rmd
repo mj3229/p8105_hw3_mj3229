@@ -215,6 +215,8 @@ zillow_df %>%
     x = "Year",
     y = "Average Rent Price"
   )
+
+price_trend
 ```
 
 Throughout all the boroughs, we see increase in rent prices over the years. Specifically in Manhattan, there are significant increases in rent while it remains the most expensive borough. Brooklyn and Queens show a steadier increase in rent particularly after 2020 and remain the second and third most expensive boroughs. Although Bronx is on the lower end of rent prices. there is significant increase in rent after 2020 (maybe due to covid).
@@ -250,6 +252,8 @@ zillow_df %>%
     y = "Average Rent Price",
   ) +
   theme(legend.position = "bottom")
+
+trend_2023
 ```
 
 Looking at the distribution, we see similar trends to past plots/tables. We see high prices in the Manhattan borough with more wide variation in rent prices. We also see most of Staten Island and Bronx have narrow peaked distribution showing more uniform rent pricing and less variability even throughout the year. Lastly. Brooklyn and Queens are in the middle with moderate spread and overlap over the months. 
@@ -273,6 +277,8 @@ ggsave(
   height = 10,
   dpi = 300,
 )
+
+combined
 ```
 
 ## Problem 3
